@@ -41,9 +41,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = [
-    "core",
-]
+LOCAL_APPS = ["core", "user"]
 
 
 THIRD_PARTY_APPS = [
