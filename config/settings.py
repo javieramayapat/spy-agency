@@ -46,7 +46,10 @@ LOCAL_APPS = [
 ]
 
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "drf_spectacular",
+]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
@@ -138,3 +141,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # overview of the user
 AUTH_USER_MODEL = "core.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "API for (M16) Secret Intelligence Service Hit Mapping 🕵️🥷",
+    "DESCRIPTION": "Implementation of a new API system for handling assassinations that is used by the M16 agency 🕵️, which if you saw James Bond is responsible for intelligence gathering abroad for the British government and is considered one of the main intelligence agencies of the world. 🌐",
+    "VERSION": "1.0.0",
+    "CONTACT": {
+        "name": "Javier Amaya",
+        "url": "https://github.com/javieramayapat",
+    },
+    # "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
+}
