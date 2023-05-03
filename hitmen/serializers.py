@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 
 from core.models import ManagerUser, User
 
@@ -11,35 +12,37 @@ class HitmenSerializer(serializers.ModelSerializer):
 
 
 class AssignHitmanToManagerSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    hitman = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(is_hitman=True)
-    )
+    manager_id = serializers.IntegerField()
 
-    def validate_user_id(self, value):
-        try:
-            manager = User.objects.get(pk=value, is_manager=True)
-        except User.DoesNotExist:
+    def validate_manager_id(self, value):
+        manager = get_object_or_404(User, pk=value)
+        if not manager.is_manager:
             raise serializers.ValidationError(
-                "Invalid user_id, not a manager."
+                detail="Selected user is not a manager"
             )
         return value
 
-    def validate_hitman(self, value):
-        if not value.is_active:
+    def validate(self, data):
+        hitman_id = self.context.get("hitman_id")
+        hitman = get_object_or_404(User, pk=hitman_id)
+        if hitman.id == 1:
             raise serializers.ValidationError(
-                "Cannot assign an inactive hitman."
+                detail="Manager assignment not allowed"
             )
-        if value.is_manager:
+        if not hitman.is_hitman:
             raise serializers.ValidationError(
-                "Cannot assign a hitman that is also a manager."
+                detail="Only hitmen can have managers"
             )
-        return value
+        if not hitman.is_active:
+            raise serializers.ValidationError(
+                detail="Cannot Assign a manager to inactive hitman"
+            )
+        return data
 
     def create(self, validated_data):
-        manager = User.objects.get(pk=validated_data["user_id"])
-        hitman = validated_data["hitman"]
-        manager_user, created = ManagerUser.objects.get_or_create(
-            manager=manager, hitman=hitman
-        )
+        manager_id = validated_data["manager_id"]
+        hitman_id = self.context.get("hitman_id")
+        manager = get_object_or_404(get_user_model(), pk=manager_id)
+        hitman = get_object_or_404(get_user_model(), pk=hitman_id)
+        manager_user = ManagerUser.objects.create(manager=manager, user=hitman)
         return manager_user
