@@ -41,7 +41,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["core", "user"]
+LOCAL_APPS = ["core", "user", "hitmen", "hits"]
 
 
 THIRD_PARTY_APPS = [
@@ -143,9 +143,9 @@ AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    # "DEFAULT_AUTHENTICATION_CLASSES": [
-    # "rest_framework.authentication.TokenAuthentication",
-    # ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
 }
 SPECTACULAR_SETTINGS = {
     "TITLE": "API for (M16) Secret Intelligence Service Hit Mapping 🕵️🥷",
