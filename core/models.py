@@ -13,7 +13,15 @@ class UserManager(BaseUserManager):
 
         user = Hitman(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
+        user.is_superuser = False
         user.save(using=self._db)
+
+        # All user register in the system belongs to big boss
+        big_boss = User.objects.get(id=1)
+        manager_user = ManagerUser.objects.create(
+            user_id=user.id, manager_id=big_boss.id
+        )
+        manager_user.save()
 
         return user
 
