@@ -8,6 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
+
 
 from core.models import ManagerUser
 from core.permissions import IsManagerOrBigBoss
@@ -22,6 +24,10 @@ class HitmenViewSet(viewsets.ViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = HitmenSerializer
 
+    @extend_schema(
+        tags=["Hitmen"],
+        description="List all hitmen.",
+    )
     def list(self, request):
         user = request.user
 
@@ -39,6 +45,11 @@ class HitmenViewSet(viewsets.ViewSet):
         serializer = HitmenSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        tags=["Hitmen"],
+        request=None,
+        description="Deactivate Hitman",
+    )
     @action(detail=True, methods=["post"])
     def deactivate(self, request, pk=None):
         user = get_object_or_404(self.queryset, pk=pk)
@@ -65,6 +76,7 @@ class HitmenViewSet(viewsets.ViewSet):
             )
 
     @extend_schema(
+        tags=["Hitmen"],
         request=AssignHitmanToManagerSerializer,
         description="Assign manager to Hitman",
     )

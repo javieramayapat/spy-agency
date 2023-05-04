@@ -22,6 +22,10 @@ class HitViewSet(viewsets.ViewSet):
     serializer_class = HitSerializer
     queryset = Hit.objects.all()
 
+    @extend_schema(
+        tags=["Hits"],
+        description="List all Hits.",
+    )
     @permission_classes([IsHitman, IsManager, IsBigBoss])
     def list(self, request):
         user = request.user
@@ -34,14 +38,20 @@ class HitViewSet(viewsets.ViewSet):
         serializer = HitSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        tags=["Hits"],
+        description="Hits Detail.",
+    )
     @permission_classes([IsManager, IsBigBoss])
     def retrieve(self, request, pk=None):
         hit = get_object_or_404(self.queryset, pk=pk)
         serializer = HitDetailSerializer(hit)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        tags=["Hits"], request=HitSerializer, description="Create Hits"
+    )
     @permission_classes([IsManagerOrBigBoss])
-    @extend_schema(request=HitSerializer, description="Create Hits")
     def create(self, request):
         serializer = HitSerializer(data=request.data)
         if serializer.is_valid():
@@ -55,7 +65,9 @@ class HitViewSet(viewsets.ViewSet):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @extend_schema(request=HitSerializer, description="Update Hits")
+    @extend_schema(
+        tags=["Hits"], request=HitSerializer, description="Update Hits"
+    )
     @permission_classes([IsAuthenticated, IsBigBoss])
     def update(self, request, pk=None):
         hit = Hit.objects.get(pk=pk)
@@ -71,11 +83,13 @@ class HitViewSet(viewsets.ViewSet):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=["post"])
     @extend_schema(
-        request=HitStatusSerializer, description="Update Hits' status"
+        tags=["Hits"],
+        request=HitStatusSerializer,
+        description="Update Hit status valida options (failed, completed)",
     )
     @permission_classes([IsAuthenticated, IsHitman, IsManager, IsBigBoss])
+    @action(detail=True, methods=["post"])
     def status(self, request, pk=None):
         hit = get_object_or_404(self.queryset, pk=pk)
 
@@ -94,6 +108,11 @@ class HitViewSet(viewsets.ViewSet):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
+    @extend_schema(
+        tags=["Hits"],
+        request=HitAssignedHitmanSerializer,
+        description="Update Hits' status",
+    )
     @permission_classes([IsAuthenticated, IsBigBoss])
     @action(detail=True, methods=["post"])
     def assign_hitman(self, request, pk=None):
